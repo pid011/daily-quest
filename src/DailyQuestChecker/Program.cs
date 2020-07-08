@@ -71,7 +71,7 @@ namespace DailyQuestChecker
             {
                 try
                 {
-                    DailyQuest dailyQuest = DailyQuest.GetDailyQuest();
+                    DailyQuest dailyQuest = DailyQuest.GetTodayDailyQuest();
 
                     dailyQuest.Quests[index - 1].HasDone = !dailyQuest.Quests[index - 1].HasDone;
                     DailyQuest.WriteTodayDailyQuestDataOnFile(dailyQuest);
@@ -128,7 +128,7 @@ namespace DailyQuestChecker
 
         private static void PrintDailyQuest()
         {
-            DailyQuest dailyQuest = DailyQuest.GetDailyQuest();
+            DailyQuest dailyQuest = DailyQuest.GetTodayDailyQuest();
 
             StringBuilder builder = new StringBuilder();
             if (dailyQuest.Quests.Count == 0)
@@ -201,14 +201,14 @@ namespace DailyQuestChecker
         public const string _defaultFileName = "daily-quests.txt";
 
         /// <summary>
-        /// 오늘 해야하는 일일퀘스트 데이터를 파일에서 읽어옵니다.
+        /// 오늘의 일일퀘스트 데이터를 파일에서 읽어옵니다.
         /// </summary>
         /// <returns>
-        /// 오늘 해야하는 일일퀘스트 데이터를 반환합니다.<para/>
+        /// 오늘의 일일퀘스트 데이터를 반환합니다.<para/>
         /// 만약 데이터의 <see cref="RefreshTime"/>이 현재 시간보다 하루 전이라면 데이터를 초기화하고 새로운 데이터를 반환합니다.<para/>
         /// 만약 파일이 존재하지 않으면 파일을 새로 생성하고 초기화된 데이터를 반환합니다.
         /// </returns>
-        public static DailyQuest GetDailyQuest()
+        public static DailyQuest GetTodayDailyQuest()
         {
             DailyQuest dailyQuest = null;
             var serializer = new JsonSerializer();
@@ -251,7 +251,7 @@ namespace DailyQuestChecker
         }
 
         /// <summary>
-        /// 파일에 매개변수로 받은 데이터를 작성하고 <see cref="RefreshTime"/>을 현재 시간으로 초기화합니다.
+        /// 오늘의 일일퀘스트 파일에 매개변수로 받은 데이터를 작성하고 <see cref="RefreshTime"/>을 현재 시간으로 초기화합니다.
         /// </summary>
         /// <param name="dailyQuest"></param>
         public static void WriteTodayDailyQuestDataOnFile(DailyQuest dailyQuest)
@@ -278,7 +278,7 @@ namespace DailyQuestChecker
         }
 
         /// <summary>
-        /// 파일에서 기본 일일퀘스트 목록을 가져옵니다. 파일이 없다면 파일을 생성합니다.
+        /// 기본 일일퀘스트 파일에서 목록을 가져옵니다. 파일이 없다면 파일을 생성합니다.
         /// </summary>
         /// <returns>
         /// 초기화된 기본 일일퀘스트 목록을 반환합니다.<para/>
