@@ -3,6 +3,12 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>Pilgyeong Gwak</Authors>
+    <Company />
+    <Product />
+    <Description>매일매일 일일퀘스트 체크</Description>
+    <PackageProjectUrl>https://github.com/pid011/daily-quest-checker</PackageProjectUrl>
+    <NeutralLanguage>ko</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
