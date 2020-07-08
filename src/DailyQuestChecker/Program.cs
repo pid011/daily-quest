@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -62,28 +63,55 @@ namespace DailyQuestChecker
 
         private static void RunCheckCommand(string[] args)
         {
-            if (args.Length == 1)
+            // args의 개수가 1개이면 항목번호를 입력하지 않은 것이므로 명령어 사용방법 출력
+            if (args.Length <= 1)
             {
-                Console.WriteLine("명령어 사용방법: check [항목번호]");
+                Console.WriteLine("명령어 사용방법: check [항목번호] (1개 이상의 항목번호 입력 가능)");
                 return;
             }
-            if (int.TryParse(args[1], out int index))
+
+            DailyQuest dailyQuest = DailyQuest.GetTodayDailyQuest();
+
+            List<int> numbers = new List<int>(args.Length - 1);
+            // 입력한 번호 중 제대로 되고 항목이 수정된 번호를 모아놓는 리스트
+            List<int> goodNumbers = new List<int>(numbers.Count);
+
+            // 정수가 아닌 입력 걸러내기
+            for (int i = 1; i < args.Length; i++)
+            {
+                if (int.TryParse(args[i], out int result))
+                {
+                    numbers.Add(result);
+                }
+            }
+            // 입력된 숫자를 오름차순으로 정렬
+            numbers.Sort();
+
+            // 중복된 숫자를 제거하고 반복문 실행
+            foreach (var i in numbers.Distinct())
             {
                 try
                 {
-                    DailyQuest dailyQuest = DailyQuest.GetTodayDailyQuest();
-
-                    dailyQuest.Quests[index - 1].HasDone = !dailyQuest.Quests[index - 1].HasDone;
-                    DailyQuest.WriteTodayDailyQuestDataOnFile(dailyQuest);
+                    // 해당 항목의 bool 값을 반대 값으로 변경
+                    dailyQuest.Quests[i - 1].HasDone = !dailyQuest.Quests[i - 1].HasDone;
+                    goodNumbers.Add(i);
                 }
                 catch (ArgumentOutOfRangeException)
                 {
-                    Console.WriteLine("잘못된 번호입니다.");
+                    // 만약 입력된 번호가 현재 존재하는 일일퀘스트 번호와 맞지 않으면 그냥 넘어가기
+                    continue;
                 }
+            }
+
+            // goodNumbers의 개수가 0개면 아무런 항목도 수정되지 않은 것입니다
+            if (goodNumbers.Count == 0)
+            {
+                Console.WriteLine("제대로 된 번호를 입력하지 않아 아무런 항목도 수정되지 않았습니다.");
             }
             else
             {
-                Console.WriteLine("숫자로 입력해주세요.");
+                DailyQuest.WriteTodayDailyQuestDataOnFile(dailyQuest);
+                Console.WriteLine($"{string.Join(", ", goodNumbers)}번 항목이 수정 되었습니다.");
             }
         }
 
