@@ -84,28 +84,28 @@ namespace DailyQuestChecker
                 return;
             }
 
-            List<int> numbers = new List<int>(args.Length - 1);
-            // 입력한 번호 중 제대로 되고 항목이 수정된 번호를 모아놓는 리스트
-            List<int> goodNumbers = new List<int>(numbers.Count);
+            List<int> integers = new List<int>(args.Length - 1);
+            List<int> goodNumbers = new List<int>(integers.Count);
 
             // 정수가 아닌 입력 걸러내기
             for (int i = 1; i < args.Length; i++)
             {
                 if (int.TryParse(args[i], out int result))
                 {
-                    numbers.Add(result);
+                    integers.Add(result);
                 }
             }
             // 입력된 숫자를 오름차순으로 정렬
-            numbers.Sort();
+            integers.Sort();
 
             // 중복된 숫자를 제거하고 반복문 실행
-            foreach (var i in numbers.Distinct())
+            foreach (var i in integers.Distinct())
             {
                 try
                 {
                     // 해당 항목의 bool 값을 반대 값으로 변경
                     item.Quests[i - 1].HasDone = !item.Quests[i - 1].HasDone;
+                    // 값을 변경의 항목의 번호 추가
                     goodNumbers.Add(i);
                 }
                 catch (ArgumentOutOfRangeException)
@@ -115,7 +115,7 @@ namespace DailyQuestChecker
                 }
             }
 
-            // goodNumbers의 개수가 0개면 아무런 항목도 수정되지 않은 것입니다
+            // goodNumbers의 개수가 0개면 아무런 항목도 수정되지 않은 것임
             if (goodNumbers.Count == 0)
             {
                 Console.WriteLine("제대로 된 번호를 입력하지 않아 아무런 항목도 수정되지 않았습니다.");
@@ -171,7 +171,7 @@ namespace DailyQuestChecker
         private static void PrintDailyQuest(DailyQuestItem item)
         {
             StringBuilder builder = new StringBuilder().AppendLine();
-            if (item.Quests.Count == 0)
+            if (item.Quests.Count == 0) // 갯수가 0이면 목록이 존재하지 않는다는 메시지 출력
             {
                 builder
                     .AppendLine("현재 일일퀘스트 목록이 없습니다.")
@@ -179,6 +179,7 @@ namespace DailyQuestChecker
             }
             else
             {
+                // 목록의 마지막 항목 번호를 뜻하는 목록의 갯수의 자리수 가져오기
                 int max = GetDigitLength(item.Quests.Count);
                 int hasDoneCount = 0;
 
@@ -200,6 +201,7 @@ namespace DailyQuestChecker
                 }
                 builder.AppendLine();
 
+                // 모든 항목이 체크 되어있을 때
                 if (hasDoneCount == item.Quests.Count)
                 {
                     builder.AppendLine("🎉 오늘의 일일퀘스트를 모두 끝냈습니다 🎉");
@@ -207,11 +209,11 @@ namespace DailyQuestChecker
                 else
                 {
                     builder.AppendLine($"현재 총 {item.Quests.Count}개의 항목 중 {hasDoneCount}개의 항목을 완료했습니다.");
+
                     DateTime now = DateTime.Now;
                     int hour = 23 - now.Hour;
                     int minute = 59 - now.Minute;
                     int second = 59 - now.Second;
-
                     builder.AppendLine($"자정까지 {hour}시간 {minute}분 {second}초 남았습니다. 파이팅! 👊");
                 }
             }
@@ -276,10 +278,11 @@ namespace DailyQuestChecker
         public static DailyQuestItem GetTodayDailyQuest()
         {
             DailyQuestItem item = null;
-            bool serialized = true;
+            bool deserialized = true;
 
             try
             {
+                // 파일에서 json으로 구성된 오늘의 일일퀘스트 목록 가져오기
                 using FileStream fs = File.OpenRead(TodayFileName);
                 byte[] jsonBytes = new byte[fs.Length];
                 int numBytesToRead = (int)fs.Length;
@@ -295,25 +298,27 @@ namespace DailyQuestChecker
                     numBytesToRead -= n;
                 }
                 var utf8Reader = new Utf8JsonReader(jsonBytes);
+                // json 데이터를 DailyQuestItem으로 역직렬화
                 item = JsonSerializer.Deserialize<DailyQuestItem>(ref utf8Reader);
 
                 // 현재 날짜가 데이터가 기록된 시간의 날짜와 다를 때
                 if (DateTime.Now.Day != item.RefreshTime.Day)
                 {
-                    serialized = false;
+                    deserialized = false;
                 }
             }
             catch (FileNotFoundException)
             {
-                serialized = false;
+                deserialized = false;
             }
             catch (JsonException)
             {
                 throw;
             }
 
-            if (!serialized)
+            if (!deserialized)
             {
+                // 기본 일일퀘스트로 다시 덮어쓰기
                 item = GetDefaultDailyQuest();
                 WriteFileAndRefreshTime(ref item);
             }
