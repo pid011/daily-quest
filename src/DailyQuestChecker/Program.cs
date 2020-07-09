@@ -12,11 +12,11 @@ namespace DailyQuestChecker
         /// <summary>
         /// 완료한 항목에 표시될 문자
         /// </summary>
-        private const string _checkMark = "\u2714"; // 체크 표시 이모티콘 ✔️
+        private const string _checkMark = "✔️";
         /// <summary>
         /// 완료되지 않은 항목에 표시될 문자
         /// </summary>
-        private const string _crossMark = " ";
+        private const string _crossMark = "❌";
 
         private static readonly Dictionary<string, string> _commands = new Dictionary<string, string>
         {
@@ -167,28 +167,22 @@ namespace DailyQuestChecker
 
         private static void PrintDailyQuest(DailyQuestItem item)
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new StringBuilder().AppendLine();
             if (item.Quests.Count == 0)
             {
-                Console.WriteLine("현재 일일퀘스트 목록이 없습니다.");
-                Console.WriteLine($"만약 기본 일일퀘스트 목록을 변경하였으면 reset 명령어를 실행해보세요.");
-                return;
+                builder
+                    .AppendLine("현재 일일퀘스트 목록이 없습니다.")
+                    .AppendLine("만약 기본 일일퀘스트 목록을 변경하였으면 reset 명령어를 실행해보세요.");
             }
-            int length = 0;
-            for (int i = 0; i < item.Quests.Count; i++)
+            else
             {
-                builder.Append($"│ {i + 1}. [{(item.Quests[i].HasDone ? _checkMark : _crossMark)}] - ");
-                builder.AppendLine(item.Quests[i].QuestDescription);
-                if (item.Quests[i].QuestDescription.Length > length)
+                for (int i = 0; i < item.Quests.Count; i++)
                 {
-                    length = item.Quests[i].QuestDescription.Length;
+                    builder
+                        .Append($"  {i + 1}. [{(item.Quests[i].HasDone ? _checkMark : _crossMark)}] - ")
+                        .AppendLine(item.Quests[i].QuestDescription);
                 }
             }
-
-            string line = "".PadRight(18 + length, '─');
-            builder.Insert(0, $"┌{line}┐\n");
-            builder.AppendLine($"└{line}┘");
-
             Console.WriteLine(builder.ToString());
         }
     }
