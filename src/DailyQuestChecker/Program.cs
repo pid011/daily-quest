@@ -176,14 +176,23 @@ namespace DailyQuestChecker
             }
             else
             {
+                int max = GetDigitLength(item.Quests.Count);
+
                 for (int i = 0; i < item.Quests.Count; i++)
                 {
+                    int length = GetDigitLength(i + 1);
+                    string number = (i + 1).ToString();
+                    // 오른쪽 정렬
+                    number = number.PadLeft(max - length + number.Length);
                     builder
-                        .Append($"  {i + 1}. [{(item.Quests[i].HasDone ? _checkMark : _crossMark)}] - ")
+                        .Append($"  {number}. [{(item.Quests[i].HasDone ? _checkMark : _crossMark)}] - ")
                         .AppendLine(item.Quests[i].QuestDescription);
                 }
             }
             Console.WriteLine(builder.ToString());
+
+            // 자연수의 자릿수를 구하는 로컬 함수
+            static int GetDigitLength(int n) => n < 1 ? 0 : (int)Math.Log10(n) + 1;
         }
     }
 
