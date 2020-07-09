@@ -19,7 +19,7 @@ namespace DailyQuestChecker
         /// </summary>
         private const string _crossMark = " ";
 
-        private readonly static Dictionary<string, string> _commands = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> _commands = new Dictionary<string, string>
         {
             ["check"] = "선택한 항목을 체크하거나 체크해제합니다.",
             ["reset"] = "오늘의 일일퀘스트를 초기화합니다.",
@@ -278,7 +278,7 @@ namespace DailyQuestChecker
                 item = GetDefaultDailyQuest();
                 WriteTodayDailyQuestDataOnFile(item);
             }
-            
+
             return item;
         }
 
