@@ -1,11 +1,10 @@
-﻿using Newtonsoft.Json;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json;
 
 namespace DailyQuestChecker
 {
@@ -71,7 +70,7 @@ namespace DailyQuestChecker
                 return;
             }
 
-            DailyQuest dailyQuest = DailyQuest.GetTodayDailyQuest();
+            DailyQuestItem dailyQuest = DailyQuest.GetTodayDailyQuest();
 
             List<int> numbers = new List<int>(args.Length - 1);
             // 입력한 번호 중 제대로 되고 항목이 수정된 번호를 모아놓는 리스트
@@ -157,7 +156,7 @@ namespace DailyQuestChecker
 
         private static void PrintDailyQuest()
         {
-            DailyQuest dailyQuest = DailyQuest.GetTodayDailyQuest();
+            DailyQuestItem dailyQuest = DailyQuest.GetTodayDailyQuest();
 
             StringBuilder builder = new StringBuilder();
             if (dailyQuest.Quests.Count == 0)
@@ -188,37 +187,35 @@ namespace DailyQuestChecker
     /// <summary>
     /// 일일퀘스트에 대한 요소를 가지고 있습니다.
     /// </summary>
-    [DataContract]
     public class Quest
     {
         /// <summary>
         /// 일일퀘스트 설명
         /// </summary>
-        [DataMember]
         public string QuestDescription { get; set; }
 
         /// <summary>
         /// 일일퀘스트를 했는지 여부
         /// </summary>
-        [DataMember]
         public bool HasDone { get; set; }
     }
 
-    [DataContract]
-    public class DailyQuest
+    public class DailyQuestItem
     {
         /// <summary>
         /// json 파일이 새로 쓰여진 시간
         /// </summary>
-        [DataMember]
-        public DateTime RefreshTime { get; set; }
+        public DateTimeOffset RefreshTime { get; set; }
 
         /// <summary>
         /// 일일퀘스트 리스트
         /// </summary>
-        [DataMember]
-        public List<Quest> Quests { get; set; }
+        public IList<Quest> Quests { get; set; }
 
+    }
+
+    public class DailyQuest
+    {
         /// <summary>
         /// 오늘의 일일퀘스트 항목을 가지고 있는 파일이름
         /// </summary>
@@ -237,73 +234,71 @@ namespace DailyQuestChecker
         /// 만약 데이터의 <see cref="RefreshTime"/>이 현재 시간보다 하루 전이라면 데이터를 초기화하고 새로운 데이터를 반환합니다.<para/>
         /// 만약 파일이 존재하지 않으면 파일을 새로 생성하고 초기화된 데이터를 반환합니다.
         /// </returns>
-        public static DailyQuest GetTodayDailyQuest()
+        public static DailyQuestItem GetTodayDailyQuest()
         {
-            DailyQuest dailyQuest = null;
-            var serializer = new JsonSerializer();
-
+            DailyQuestItem item = null;
             bool serialized = true;
+
             try
             {
-                using (Stream stream = File.Open(_todayFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-                using (StreamReader reader = new StreamReader(stream))
-                using (JsonReader jsonReader = new JsonTextReader(reader))
+                using FileStream fs = File.OpenRead(_todayFileName);
+                byte[] jsonBytes = new byte[fs.Length];
+                int numBytesToRead = (int)fs.Length;
+                int numBytesRead = 0;
+                while (numBytesToRead > 0)
                 {
-                    dailyQuest = serializer.Deserialize<DailyQuest>(jsonReader);
+                    int n = fs.Read(jsonBytes, numBytesRead, numBytesToRead);
+                    if (n == 0)
+                    {
+                        break;
+                    }
+                    numBytesRead += n;
+                    numBytesToRead -= n;
                 }
+                var utf8Reader = new Utf8JsonReader(jsonBytes);
+                item = JsonSerializer.Deserialize<DailyQuestItem>(ref utf8Reader);
 
                 // 현재 날짜가 데이터가 기록된 시간의 날짜와 다를 때
-                // 오늘의 일일퀘스트 데이터 초기화
-                if (DateTime.Now.Day != dailyQuest.RefreshTime.Day)
+                if (DateTime.Now.Day != item.RefreshTime.Day)
                 {
                     serialized = false;
                 }
-            }
-            catch (NullReferenceException) when (dailyQuest is null)
-            {
-                serialized = false;
             }
             catch (FileNotFoundException)
             {
                 serialized = false;
             }
-            finally
+            catch (JsonException)
             {
-                if (!serialized)
-                {
-                    dailyQuest = GetDefaultDailyQuest();
-                    WriteTodayDailyQuestDataOnFile(dailyQuest);
-                }
+                throw;
             }
 
-            return dailyQuest;
+            if (!serialized)
+            {
+                item = GetDefaultDailyQuest();
+                WriteTodayDailyQuestDataOnFile(item);
+            }
+            
+            return item;
         }
 
         /// <summary>
         /// 오늘의 일일퀘스트 파일에 매개변수로 받은 데이터를 작성하고 <see cref="RefreshTime"/>을 현재 시간으로 초기화합니다.
         /// </summary>
-        /// <param name="dailyQuest"></param>
-        public static void WriteTodayDailyQuestDataOnFile(DailyQuest dailyQuest)
+        /// <param name="item"></param>
+        public static void WriteTodayDailyQuestDataOnFile(DailyQuestItem item)
         {
-            if (dailyQuest is null)
-            {
-                dailyQuest = new DailyQuest();
-            }
-            dailyQuest.RefreshTime = DateTime.Now;
+            // item이 null일 경우 새 인스턴스 생성
+            item ??= new DailyQuestItem();
 
-            try
-            {
-                var serializer = new JsonSerializer();
-                using Stream stream = File.Open(_todayFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-                using StreamWriter writer = new StreamWriter(stream);
-                using JsonWriter jsonWriter = new JsonTextWriter(writer) { Formatting = Formatting.Indented };
-                serializer.Serialize(jsonWriter, dailyQuest, typeof(DailyQuest));
-            }
-            catch (FileNotFoundException)
-            {
-                File.Create(_todayFileName);
-                WriteTodayDailyQuestDataOnFile(dailyQuest);
-            }
+            // item 객체의 RefreshTime을 현재로 수정
+            item.RefreshTime = DateTime.Now;
+
+            // 데이터를 새로 덮어쓰기
+            using FileStream fs = File.Create(_todayFileName);
+            // item을 json으로 직렬화 후 파일에 쓰기
+            byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(item);
+            fs.Write(jsonBytes, 0, jsonBytes.Length);
         }
 
         /// <summary>
@@ -312,9 +307,9 @@ namespace DailyQuestChecker
         /// <returns>
         /// 초기화된 기본 일일퀘스트 목록을 반환합니다.<para/>
         /// </returns>
-        public static DailyQuest GetDefaultDailyQuest()
+        public static DailyQuestItem GetDefaultDailyQuest()
         {
-            DailyQuest dailyQuest = new DailyQuest
+            DailyQuestItem dailyQuest = new DailyQuestItem
             {
                 RefreshTime = DateTime.Now,
                 Quests = new List<Quest>()
@@ -322,12 +317,13 @@ namespace DailyQuestChecker
 
             try
             {
-                using Stream stream = File.Open(_defaultFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-                using StreamReader reader = new StreamReader(stream);
+                using StreamReader sr = File.OpenText(_defaultFileName);
                 string input;
-                while (reader.Peek() >= 0)
+
+                // 파일에서 한 줄씩 읽어오기
+                while ((input = sr.ReadLine()) != null)
                 {
-                    input = reader.ReadLine();
+                    // 읽어온 문자열이 비어있거나 띄어쓰기만 있으면 건너뛰기
                     if (!string.IsNullOrWhiteSpace(input))
                     {
                         dailyQuest.Quests.Add(new Quest { QuestDescription = input });
@@ -336,8 +332,8 @@ namespace DailyQuestChecker
             }
             catch (FileNotFoundException)
             {
+                // 파일이 존재하지 않는 경우 새로 만들고 처음에 생성한 인스턴스를 그대로 반환하기
                 File.Create(_defaultFileName);
-                dailyQuest = GetDefaultDailyQuest();
             }
 
             return dailyQuest;
