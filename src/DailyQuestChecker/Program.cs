@@ -12,13 +12,13 @@ namespace DailyQuestChecker
     internal class Program
     {
         /// <summary>
-        /// 체크 표시 이모티콘
+        /// 완료한 항목에 표시될 문자
         /// </summary>
-        private const string _checkMark = "o";
+        private const string _checkMark = "\u2714"; // 체크 표시 이모티콘 ✔️
         /// <summary>
-        /// X 표시 이모티콘
+        /// 완료되지 않은 항목에 표시될 문자
         /// </summary>
-        private const string _crossMark = "x";
+        private const string _crossMark = " ";
 
         private readonly static Dictionary<string, string> _commands = new Dictionary<string, string>
         {
@@ -29,6 +29,7 @@ namespace DailyQuestChecker
 
         private static void Main(string[] args)
         {
+            Console.OutputEncoding = Encoding.UTF8;
             try
             {
                 if (args.Length == 0)
