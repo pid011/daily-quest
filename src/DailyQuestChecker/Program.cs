@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Sepi. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,11 +15,11 @@ namespace DailyQuestChecker
         /// <summary>
         /// 완료한 항목에 표시될 문자
         /// </summary>
-        private const string _checkMark = "✔️";
+        private const string CheckMark = "✔️";
         /// <summary>
         /// 완료되지 않은 항목에 표시될 문자
         /// </summary>
-        private const string _crossMark = "❌";
+        private const string CrossMark = "❌";
 
         private static readonly Dictionary<string, string> _commands = new Dictionary<string, string>
         {
@@ -157,7 +160,7 @@ namespace DailyQuestChecker
         {
             StringBuilder builder = new StringBuilder();
             builder.AppendLine("명령어 목록:");
-            foreach (var item in _commands)
+            foreach (KeyValuePair<string, string> item in _commands)
             {
                 builder.AppendLine($"{' ',2}{item.Key,-20}{item.Value}");
             }
@@ -185,7 +188,7 @@ namespace DailyQuestChecker
                     // 오른쪽 정렬
                     number = number.PadLeft(max - length + number.Length);
                     builder
-                        .Append($"  {number}. [{(item.Quests[i].HasDone ? _checkMark : _crossMark)}] - ")
+                        .Append($"  {number}. [{(item.Quests[i].HasDone ? CheckMark : CrossMark)}] - ")
                         .AppendLine(item.Quests[i].QuestDescription);
                 }
             }
@@ -231,12 +234,12 @@ namespace DailyQuestChecker
         /// <summary>
         /// 오늘의 일일퀘스트 항목을 가지고 있는 파일이름
         /// </summary>
-        public const string _todayFileName = "today-daily-quests.daily";
+        public const string TodayFileName = "today-daily-quests.daily";
 
         /// <summary>
         /// 기본 일일퀘스트 리스트를 가지고 있는 파일이름
         /// </summary>
-        public const string _defaultFileName = "daily-quests.txt";
+        public const string DefaultFileName = "daily-quests.txt";
 
         /// <summary>
         /// 오늘의 일일퀘스트 데이터를 파일에서 읽어옵니다.
@@ -253,7 +256,7 @@ namespace DailyQuestChecker
 
             try
             {
-                using FileStream fs = File.OpenRead(_todayFileName);
+                using FileStream fs = File.OpenRead(TodayFileName);
                 byte[] jsonBytes = new byte[fs.Length];
                 int numBytesToRead = (int)fs.Length;
                 int numBytesRead = 0;
@@ -307,7 +310,7 @@ namespace DailyQuestChecker
             item.RefreshTime = DateTime.Now;
 
             // 데이터를 새로 덮어쓰기
-            using FileStream fs = File.Create(_todayFileName);
+            using FileStream fs = File.Create(TodayFileName);
             // item을 json으로 직렬화 후 파일에 쓰기
             byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(item);
             fs.Write(jsonBytes, 0, jsonBytes.Length);
@@ -329,7 +332,7 @@ namespace DailyQuestChecker
 
             try
             {
-                using StreamReader sr = File.OpenText(_defaultFileName);
+                using StreamReader sr = File.OpenText(DefaultFileName);
                 string input;
 
                 // 파일에서 한 줄씩 읽어오기
@@ -345,7 +348,7 @@ namespace DailyQuestChecker
             catch (FileNotFoundException)
             {
                 // 파일이 존재하지 않는 경우 새로 만들고 처음에 생성한 인스턴스를 그대로 반환하기
-                File.Create(_defaultFileName);
+                File.Create(DefaultFileName);
             }
 
             return dailyQuest;

@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7E6CF41C-1AC4-4FCE-8DFE-14EF6B26E9D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyQuestChecker", "src\DailyQuestChecker\DailyQuestChecker.csproj", "{F0A5F13D-1645-443D-AFF0-DD08A0AAE930}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DailyQuestChecker", "src\DailyQuestChecker\DailyQuestChecker.csproj", "{F0A5F13D-1645-443D-AFF0-DD08A0AAE930}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EAB30CB1-D2B6-4447-BD3B-4D6A41DE6D5B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F0A5F13D-1645-443D-AFF0-DD08A0AAE930}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -33,7 +35,13 @@ Global
 		{F0A5F13D-1645-443D-AFF0-DD08A0AAE930}.Release|x86.ActiveCfg = Release|Any CPU
 		{F0A5F13D-1645-443D-AFF0-DD08A0AAE930}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F0A5F13D-1645-443D-AFF0-DD08A0AAE930} = {7E6CF41C-1AC4-4FCE-8DFE-14EF6B26E9D3}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A4E0BCE-5FF7-40AF-AC1F-F50F22B1100C}
 	EndGlobalSection
 EndGlobal
