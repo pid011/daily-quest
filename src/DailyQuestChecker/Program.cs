@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 
@@ -31,37 +30,49 @@ namespace DailyQuestChecker
             Console.OutputEncoding = Encoding.UTF8;
             try
             {
+                DailyQuestItem item;
+
+                // 인자를 입력하지 않고 그냥 프로그램을 실행할 경우 그냥 일퀘목록만 출력
                 if (args.Length == 0)
                 {
-                    PrintDailyQuest();
-                    return;
+                    item = DailyQuest.GetTodayDailyQuest();
+                    PrintDailyQuest(item);
                 }
-
-                switch (args[0])
+                else
                 {
-                    case "check":
-                        RunCheckCommand(args);
-                        break;
+                    switch (args[0])
+                    {
+                        case "check":
+                            item = DailyQuest.GetTodayDailyQuest();
+                            RunCheckCommand(ref item, args);
+                            PrintDailyQuest(item);
+                            break;
 
-                    case "reset":
-                        RunResetCommand();
-                        break;
+                        case "reset":
+                            item = DailyQuest.GetTodayDailyQuest();
 
-                    case "-h":
-                    default:
-                        PrintHelpMessage();
-                        return;
+                            // Reset명령어 실행 후 유저가 초기화를 하면 초기화된 목록 출력
+                            if (RunResetCommand(ref item))
+                            {
+                                PrintDailyQuest(item);
+                            }
+                            break;
+
+                        case "-h":
+                        default:
+                            PrintHelpMessage();
+                            break;
+                    }
                 }
-                PrintDailyQuest();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(e.ToString());
             }
 
         }
 
-        private static void RunCheckCommand(string[] args)
+        private static void RunCheckCommand(ref DailyQuestItem item, string[] args)
         {
             // args의 개수가 1개이면 항목번호를 입력하지 않은 것이므로 명령어 사용방법 출력
             if (args.Length <= 1)
@@ -69,8 +80,6 @@ namespace DailyQuestChecker
                 Console.WriteLine("명령어 사용방법: check [항목번호] (1개 이상의 항목번호 입력 가능)");
                 return;
             }
-
-            DailyQuestItem dailyQuest = DailyQuest.GetTodayDailyQuest();
 
             List<int> numbers = new List<int>(args.Length - 1);
             // 입력한 번호 중 제대로 되고 항목이 수정된 번호를 모아놓는 리스트
@@ -93,7 +102,7 @@ namespace DailyQuestChecker
                 try
                 {
                     // 해당 항목의 bool 값을 반대 값으로 변경
-                    dailyQuest.Quests[i - 1].HasDone = !dailyQuest.Quests[i - 1].HasDone;
+                    item.Quests[i - 1].HasDone = !item.Quests[i - 1].HasDone;
                     goodNumbers.Add(i);
                 }
                 catch (ArgumentOutOfRangeException)
@@ -110,12 +119,12 @@ namespace DailyQuestChecker
             }
             else
             {
-                DailyQuest.WriteTodayDailyQuestDataOnFile(dailyQuest);
+                DailyQuest.WriteFileAndRefreshTime(ref item);
                 Console.WriteLine($"{string.Join(", ", goodNumbers)}번 항목이 수정 되었습니다.");
             }
         }
 
-        private static void RunResetCommand()
+        private static bool RunResetCommand(ref DailyQuestItem item)
         {
             Console.WriteLine("현재까지 체크한 항목들이 사라지고 기본 일일퀘스트 항목으로 초기화됩니다.");
             while (true)
@@ -127,14 +136,16 @@ namespace DailyQuestChecker
                 {
                     case "Y":
                     case "y":
-                        var defaultDailyQuest = DailyQuest.GetDefaultDailyQuest();
-                        DailyQuest.WriteTodayDailyQuestDataOnFile(defaultDailyQuest);
+                        // 파일에서 기본 일일퀘스트 목록을 가져오기
+                        item = DailyQuest.GetDefaultDailyQuest();
+                        // 오늘의 일일퀘스트 파일에 기본 일일퀘스트 데이터 쓰기
+                        DailyQuest.WriteFileAndRefreshTime(ref item);
                         Console.WriteLine("오늘의 일일퀘스트가 초기화되었습니다.");
-                        return;
+                        return true;
                     case "N":
                     case "n":
                         Console.WriteLine("초기화를 하지 않았습니다.");
-                        return;
+                        return false;
                     default:
                         Console.WriteLine("다시 입력해주세요.");
                         break;
@@ -154,29 +165,27 @@ namespace DailyQuestChecker
             Console.WriteLine(builder.ToString());
         }
 
-        private static void PrintDailyQuest()
+        private static void PrintDailyQuest(DailyQuestItem item)
         {
-            DailyQuestItem dailyQuest = DailyQuest.GetTodayDailyQuest();
-
             StringBuilder builder = new StringBuilder();
-            if (dailyQuest.Quests.Count == 0)
+            if (item.Quests.Count == 0)
             {
                 Console.WriteLine("현재 일일퀘스트 목록이 없습니다.");
                 Console.WriteLine($"만약 기본 일일퀘스트 목록을 변경하였으면 reset 명령어를 실행해보세요.");
                 return;
             }
             int length = 0;
-            for (int i = 0; i < dailyQuest.Quests.Count; i++)
+            for (int i = 0; i < item.Quests.Count; i++)
             {
-                builder.Append($"│ {i + 1}. [{(dailyQuest.Quests[i].HasDone ? _checkMark : _crossMark)}] - ");
-                builder.AppendLine(dailyQuest.Quests[i].QuestDescription);
-                if (dailyQuest.Quests[i].QuestDescription.Length > length)
+                builder.Append($"│ {i + 1}. [{(item.Quests[i].HasDone ? _checkMark : _crossMark)}] - ");
+                builder.AppendLine(item.Quests[i].QuestDescription);
+                if (item.Quests[i].QuestDescription.Length > length)
                 {
-                    length = dailyQuest.Quests[i].QuestDescription.Length;
+                    length = item.Quests[i].QuestDescription.Length;
                 }
             }
 
-            string line = "".PadRight(20 + length, '─');
+            string line = "".PadRight(18 + length, '─');
             builder.Insert(0, $"┌{line}┐\n");
             builder.AppendLine($"└{line}┘");
 
@@ -276,17 +285,17 @@ namespace DailyQuestChecker
             if (!serialized)
             {
                 item = GetDefaultDailyQuest();
-                WriteTodayDailyQuestDataOnFile(item);
+                WriteFileAndRefreshTime(ref item);
             }
 
             return item;
         }
 
         /// <summary>
-        /// 오늘의 일일퀘스트 파일에 매개변수로 받은 데이터를 작성하고 <see cref="RefreshTime"/>을 현재 시간으로 초기화합니다.
+        /// 오늘의 일일퀘스트 파일에 매개변수로 받은 데이터를 작성하고 <see cref="RefreshTime"/>을 현재 시간으로 변경합니다.
         /// </summary>
-        /// <param name="item"></param>
-        public static void WriteTodayDailyQuestDataOnFile(DailyQuestItem item)
+        /// <param name="item">파일에 작성할 데이터</param>
+        public static void WriteFileAndRefreshTime(ref DailyQuestItem item)
         {
             // item이 null일 경우 새 인스턴스 생성
             item ??= new DailyQuestItem();
@@ -305,7 +314,7 @@ namespace DailyQuestChecker
         /// 기본 일일퀘스트 파일에서 목록을 가져옵니다. 파일이 없다면 파일을 생성합니다.
         /// </summary>
         /// <returns>
-        /// 초기화된 기본 일일퀘스트 목록을 반환합니다.<para/>
+        /// 초기화된 기본 일일퀘스트 목록을 반환합니다.
         /// </returns>
         public static DailyQuestItem GetDefaultDailyQuest()
         {
