@@ -23,9 +23,10 @@ namespace DailyQuestChecker
 
         private static readonly Dictionary<string, string> _commands = new Dictionary<string, string>
         {
-            ["check"] = "선택한 항목을 체크하거나 체크해제합니다.",
+            ["check"] = "선택한 항목을 체크하거나 체크 해제합니다.",
             ["reset"] = "오늘의 일일퀘스트를 초기화합니다.",
-            ["-h"] = "일일퀘스트 체크 프로그램의 도움말을 표시합니다."
+            ["-v"] = "일일퀘스트 체크 프로그램의 버전을 표시합니다.",
+            ["-h"] = "일일퀘스트 체크 프로그램의 도움말을 표시합니다.",
         };
 
         private static void Main(string[] args)
@@ -61,6 +62,10 @@ namespace DailyQuestChecker
                             }
                             break;
 
+                        case "-v":
+                            PrintVersionCommand();
+                            break;
+
                         case "-h":
                         default:
                             PrintHelpMessage();
@@ -72,7 +77,6 @@ namespace DailyQuestChecker
             {
                 Console.WriteLine(e.ToString());
             }
-
         }
 
         private static void RunCheckCommand(ref DailyQuestItem item, string[] args)
@@ -164,8 +168,13 @@ namespace DailyQuestChecker
             {
                 builder.AppendLine($"{' ',2}{item.Key,-20}{item.Value}");
             }
-            builder.AppendLine();
             Console.WriteLine(builder.ToString());
+        }
+
+        private static void PrintVersionCommand()
+        {
+            System.Reflection.AssemblyName assm = typeof(Program).Assembly.GetName();
+            Console.WriteLine($"{assm.Name} v{assm.Version.ToString(3)}"); // 프로그램의 버전 출력
         }
 
         private static void PrintDailyQuest(DailyQuestItem item)

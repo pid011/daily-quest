@@ -9,6 +9,7 @@
     <Description>매일매일 일일퀘스트 체크</Description>
     <PackageProjectUrl>https://github.com/pid011/daily-quest-checker</PackageProjectUrl>
     <NeutralLanguage>ko</NeutralLanguage>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
 </Project>
