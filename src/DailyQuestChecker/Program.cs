@@ -180,18 +180,42 @@ namespace DailyQuestChecker
             else
             {
                 int max = GetDigitLength(item.Quests.Count);
+                int hasDoneCount = 0;
 
                 for (int i = 0; i < item.Quests.Count; i++)
                 {
+                    bool hasDone = item.Quests[i].HasDone;
+                    if (hasDone)
+                    {
+                        hasDoneCount++;
+                    }
+
                     int length = GetDigitLength(i + 1);
                     string number = (i + 1).ToString();
                     // 오른쪽 정렬
                     number = number.PadLeft(max - length + number.Length);
                     builder
-                        .Append($"  {number}. [{(item.Quests[i].HasDone ? CheckMark : CrossMark)}] - ")
+                        .Append($"  {number}. [{(hasDone ? CheckMark : CrossMark)}] - ")
                         .AppendLine(item.Quests[i].QuestDescription);
                 }
+                builder.AppendLine();
+
+                if (hasDoneCount == item.Quests.Count)
+                {
+                    builder.AppendLine("🎉 오늘의 일일퀘스트를 모두 끝냈습니다 🎉");
+                }
+                else
+                {
+                    builder.AppendLine($"현재 총 {item.Quests.Count}개의 항목 중 {hasDoneCount}개의 항목을 완료했습니다.");
+                    DateTime now = DateTime.Now;
+                    int hour = 23 - now.Hour;
+                    int minute = 59 - now.Minute;
+                    int second = 59 - now.Second;
+
+                    builder.AppendLine($"자정까지 {hour}시간 {minute}분 {second}초 남았습니다. 파이팅! 👊");
+                }
             }
+
             Console.WriteLine(builder.ToString());
 
             // 자연수의 자릿수를 구하는 로컬 함수
