@@ -11,5 +11,13 @@
         <Version>1.1.0</Version>
         <AssemblyName>daily-quest</AssemblyName>
         <RootNamespace>DailyQuest</RootNamespace>
+        <StartupObject>DailyQuest.Program</StartupObject>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
+    <ItemGroup>
+      <None Include="..\..\LICENSE">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+    </ItemGroup>
 </Project>
