@@ -15,11 +15,13 @@ namespace DailyQuestChecker
         /// <summary>
         /// 완료한 항목에 표시될 문자
         /// </summary>
-        private const string CheckMark = "✔️";
+        private const string CheckMarkEmoji = "✔️";
+        private const string CheckMarkText = "×";
         /// <summary>
         /// 완료되지 않은 항목에 표시될 문자
         /// </summary>
-        private const string CrossMark = "❌";
+        private const string CrossMarkEmoji = "❌";
+        private const string CrossMarkText = " ";
 
         private static readonly Dictionary<string, string> _commands = new Dictionary<string, string>
         {
@@ -204,16 +206,30 @@ namespace DailyQuestChecker
                     string number = (i + 1).ToString();
                     // 오른쪽 정렬
                     number = number.PadLeft(max - length + number.Length);
-                    builder
-                        .Append($"  {number}. [{(hasDone ? CheckMark : CrossMark)}] - ")
-                        .AppendLine(item.Quests[i].QuestDescription);
+                    builder.Append($"  {number}. ");
+                    if (item.UseEmoji)
+                    {
+                        builder.Append($"[{(hasDone ? CheckMarkEmoji : CrossMarkEmoji)}] - ");
+                    }
+                    else
+                    {
+                        builder.Append($"[{(hasDone ? CheckMarkText : CrossMarkText)}] - ");
+                    }
+                    builder.AppendLine(item.Quests[i].QuestDescription);
                 }
                 builder.AppendLine();
 
                 // 모든 항목이 체크 되어있을 때
                 if (hasDoneCount == item.Quests.Count)
                 {
-                    builder.AppendLine("🎉 오늘의 일일퀘스트를 모두 끝냈습니다 🎉");
+                    if (item.UseEmoji)
+                    {
+                        builder.AppendLine("🎉 오늘의 일일퀘스트를 모두 끝냈습니다! 🎉");
+                    }
+                    else
+                    {
+                        builder.AppendLine("::: 오늘의 일일퀘스트를 모두 끝냈습니다! :::");
+                    }
                 }
                 else
                 {
@@ -223,7 +239,7 @@ namespace DailyQuestChecker
                     int hour = 23 - now.Hour;
                     int minute = 59 - now.Minute;
                     int second = 59 - now.Second;
-                    builder.AppendLine($"자정까지 {hour}시간 {minute}분 {second}초 남았습니다. 파이팅! 👊");
+                    builder.AppendLine($"자정까지 {hour}시간 {minute}분 {second}초 남았습니다. 파이팅!{(item.UseEmoji ? "👊" : "")}");
                 }
             }
 
@@ -256,6 +272,11 @@ namespace DailyQuestChecker
         /// json 파일이 새로 쓰여진 시간
         /// </summary>
         public DateTimeOffset RefreshTime { get; set; }
+
+        /// <summary>
+        /// 프로그램에서 이모지 사용 여부
+        /// </summary>
+        public bool UseEmoji { get; set; }
 
         /// <summary>
         /// 일일퀘스트 리스트
@@ -343,7 +364,7 @@ namespace DailyQuestChecker
         {
             // item이 null일 경우 새 인스턴스 생성
             item ??= new DailyQuestItem();
-
+            item.Quests ??= new List<Quest>();
             // item 객체의 RefreshTime을 현재로 수정
             item.RefreshTime = DateTime.Now;
 
@@ -372,6 +393,13 @@ namespace DailyQuestChecker
             {
                 using StreamReader sr = File.OpenText(DefaultFileName);
                 string input;
+
+                // 파일의 첫 줄에서 이모지 사용 여부 읽어오기
+                input = sr.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input) && bool.TryParse(input, out bool useEmoji))
+                {
+                    dailyQuest.UseEmoji = useEmoji;
+                }
 
                 // 파일에서 한 줄씩 읽어오기
                 while ((input = sr.ReadLine()) != null)
