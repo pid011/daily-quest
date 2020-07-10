@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -176,7 +177,7 @@ namespace DailyQuestChecker
 
         private static void PrintVersionCommand()
         {
-            System.Reflection.AssemblyName assm = typeof(Program).Assembly.GetName();
+            AssemblyName assm = typeof(Program).Assembly.GetName();
             Console.WriteLine($"{assm.Name} v{assm.Version.ToString(3)}"); // 프로그램의 버전 출력
         }
 
@@ -295,12 +296,48 @@ namespace DailyQuestChecker
         /// <summary>
         /// 오늘의 일일퀘스트 항목을 가지고 있는 파일이름
         /// </summary>
-        public const string TodayFileName = "today-daily-quests.daily";
+        private const string TodayDailyQuestFileName = "today-daily-quests.daily";
 
         /// <summary>
         /// 기본 일일퀘스트 리스트를 가지고 있는 파일이름
         /// </summary>
-        public const string DefaultFileName = "daily-quests.txt";
+        private const string DefaultDailyQuestFileName = "daily-quests.txt";
+
+        private const string DataBaseDirectoryName = "database";
+        private const string ConfigDirectoryName = "config";
+
+        /// <summary>
+        /// 오늘의 일일퀘스트 파일의 위치
+        /// </summary>
+        public static string TodayDailyQuestFilePath
+        {
+            get
+            {
+                string dirPath = Path.Combine(_programDirectoryPath, DataBaseDirectoryName);
+
+                // 디렉토리가 존재하지 않으면 새로 만들고 파일경로 반환
+                return Path.Combine(Directory.CreateDirectory(dirPath).FullName, TodayDailyQuestFileName);
+            }
+        }
+
+        /// <summary>
+        /// 기본 일일퀘스트 파일의 위치
+        /// </summary>
+        public static string DefaultDailyQuestFilePath
+        {
+            get
+            {
+                string dirPath = Path.Combine(_programDirectoryPath, ConfigDirectoryName);
+
+                // 디렉토리가 존재하지 않으면 새로 만들고 파일경로 반환
+                return Path.Combine(Directory.CreateDirectory(dirPath).FullName, DefaultDailyQuestFileName);
+            }
+        }
+
+        /// <summary>
+        /// 프로그램 실행파일의 위치
+        /// </summary>
+        private static string _programDirectoryPath => Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
 
         /// <summary>
         /// 오늘의 일일퀘스트 데이터를 파일에서 읽어옵니다.
@@ -318,7 +355,7 @@ namespace DailyQuestChecker
             try
             {
                 // 파일에서 json으로 구성된 오늘의 일일퀘스트 목록 가져오기
-                using FileStream fs = File.OpenRead(TodayFileName);
+                using FileStream fs = File.OpenRead(TodayDailyQuestFilePath);
                 byte[] jsonBytes = new byte[fs.Length];
                 int numBytesToRead = (int)fs.Length;
                 int numBytesRead = 0;
@@ -374,7 +411,7 @@ namespace DailyQuestChecker
             item.RefreshTime = DateTime.Now;
 
             // 데이터를 새로 덮어쓰기
-            using FileStream fs = File.Create(TodayFileName);
+            using FileStream fs = File.Create(TodayDailyQuestFilePath);
             // item을 json으로 직렬화 후 파일에 쓰기
             byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(item);
             fs.Write(jsonBytes, 0, jsonBytes.Length);
@@ -396,7 +433,7 @@ namespace DailyQuestChecker
 
             try
             {
-                using StreamReader sr = File.OpenText(DefaultFileName);
+                using StreamReader sr = File.OpenText(DefaultDailyQuestFilePath);
                 string input;
 
                 // 파일의 첫 줄에서 이모지 사용 여부 읽어오기
@@ -426,7 +463,7 @@ namespace DailyQuestChecker
             catch (FileNotFoundException)
             {
                 // 파일이 존재하지 않는 경우 새로 만들고 처음에 생성한 인스턴스를 그대로 반환하기
-                File.Create(DefaultFileName);
+                File.Create(DefaultDailyQuestFilePath);
             }
 
             return dailyQuest;
