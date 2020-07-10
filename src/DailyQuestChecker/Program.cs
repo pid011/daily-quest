@@ -16,7 +16,7 @@ namespace DailyQuestChecker
         /// 완료한 항목에 표시될 문자
         /// </summary>
         private const string CheckMarkEmoji = "✔️";
-        private const string CheckMarkText = "×";
+        private const string CheckMarkText = "x";
         /// <summary>
         /// 완료되지 않은 항목에 표시될 문자
         /// </summary>
@@ -224,11 +224,11 @@ namespace DailyQuestChecker
                 {
                     if (item.UseEmoji)
                     {
-                        builder.AppendLine("🎉 오늘의 일일퀘스트를 모두 끝냈습니다! 🎉");
+                        builder.AppendLine("🎉🎉오늘의 일일퀘스트를 모두 끝냈습니다!🎉🎉");
                     }
                     else
                     {
-                        builder.AppendLine("::: 오늘의 일일퀘스트를 모두 끝냈습니다! :::");
+                        builder.AppendLine(":::오늘의 일일퀘스트를 모두 끝냈습니다!:::");
                     }
                 }
                 else
