@@ -396,9 +396,16 @@ namespace DailyQuestChecker
 
                 // 파일의 첫 줄에서 이모지 사용 여부 읽어오기
                 input = sr.ReadLine();
-                if (!string.IsNullOrWhiteSpace(input) && bool.TryParse(input, out bool useEmoji))
+                if (!string.IsNullOrWhiteSpace(input))
                 {
-                    dailyQuest.UseEmoji = useEmoji;
+                    if (bool.TryParse(input, out bool useEmoji))
+                    {
+                        dailyQuest.UseEmoji = useEmoji;
+                    }
+                    else
+                    {
+                        dailyQuest.Quests.Add(new Quest { QuestDescription = input });
+                    }
                 }
 
                 // 파일에서 한 줄씩 읽어오기
