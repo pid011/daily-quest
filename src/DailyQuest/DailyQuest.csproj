@@ -7,10 +7,11 @@
     <Company />
     <Product />
     <Description>매일매일 일일퀘스트 체크</Description>
-    <PackageProjectUrl>https://github.com/pid011/daily-quest-checker</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/pid011/daily-quest</PackageProjectUrl>
     <NeutralLanguage>ko</NeutralLanguage>
     <Version>1.0.3</Version>
-    <AssemblyName>daily-quest-checker</AssemblyName>
+    <AssemblyName>daily-quest</AssemblyName>
+    <RootNamespace>DailyQuest</RootNamespace>
   </PropertyGroup>
 
 </Project>

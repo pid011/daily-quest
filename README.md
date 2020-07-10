@@ -1,6 +1,6 @@
-# daily-quest-checker
+# daily-quest
 
-Command Line Interface daily quest checker
+Command Line Interface daily quest to-do program
 
 You can use it for Maplestory, Etc...
 
@@ -14,8 +14,8 @@ It is required .NET Core 3.1 SDK.
 Please install it from [link](https://dotnet.microsoft.com/download)
 
 ```powershell
-git clone https://github.com/pid011/daily-quest-checker.git
-cd daily-quest-checker
+git clone https://github.com/pid011/daily-quest.git
+cd daily-quest
 dotnet publish -c Release -o [publish directory]
 ```
 
@@ -46,9 +46,9 @@ daily quest B
 daily quest C
 ```
 
-### DailyQuestChecker
+### Run program
 
-터미널에서 `.\DailyQuestChecker.exe`를 실행하여 일일퀘스트 항목을 볼 수 있습니다.
+터미널에서 `./daily-quest.exe`를 실행하여 일일퀘스트 항목을 볼 수 있습니다.
 
 만약 프로그램의 길이가 너무 길어서 타이핑이 힘들 경우 프로그램의 이름을 `dqchecker.exe`와 같이 짧게 수정하여 실행할 수도 있습니다.
 
@@ -56,8 +56,8 @@ daily quest C
 
 먼저, 아까 수정한 `daily-quest.default.txt`를 적용하기 위해 reset 명령어를 사용합니다.
 
-```powershell
-.\DailyQuestChecker.exe reset
+```shell
+./daily-quest.exe reset
 ```
 
 초기화를 할 것이냐고 물어볼텐데, y를 입력해서 초기화를 하면 정상적으로 내용이 보이게 됩니다.
@@ -66,9 +66,9 @@ daily quest C
 
 check 명령어의 인자에 일일퀘스트 항목의 번호를 적으면 해당 항목이 체크 표시되거나 체크해제됩니다. 띄어쓰기로 구분하여서 한번에 여러개의 항목을 수정할 수 있습니다.
 
-```powershell
-.\DailyQuestChecker.exe check 2
-.\DailyQuestChecker.exe check 1 3 4
+```shell
+./daily-quest.exe check 2
+./daily-quest.exe check 1 3 4
 ```
 
 ### 일일퀘스트 체크 초기화
