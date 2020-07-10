@@ -10,6 +10,7 @@
     <PackageProjectUrl>https://github.com/pid011/daily-quest-checker</PackageProjectUrl>
     <NeutralLanguage>ko</NeutralLanguage>
     <Version>1.0.3</Version>
+    <AssemblyName>daily-quest-checker</AssemblyName>
   </PropertyGroup>
 
 </Project>
