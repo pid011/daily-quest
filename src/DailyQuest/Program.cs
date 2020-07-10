@@ -18,12 +18,12 @@ namespace DailyQuest
         /// 완료한 항목에 표시될 문자
         /// </summary>
         private const string CheckMarkEmoji = "✔️";
-        private const string CheckMarkText = "x";
+        private const string CheckMarkText = "O";
         /// <summary>
         /// 완료되지 않은 항목에 표시될 문자
         /// </summary>
         private const string CrossMarkEmoji = "❌";
-        private const string CrossMarkText = " ";
+        private const string CrossMarkText = "X";
 
         private static readonly Dictionary<string, string> _commands = new Dictionary<string, string>
         {
@@ -176,69 +176,84 @@ namespace DailyQuest
 
         private static void PrintDailyQuest(DailyQuestItem item)
         {
-            StringBuilder builder = new StringBuilder().AppendLine();
+            Console.WriteLine();
+
             if (item.Quests.Count == 0) // 갯수가 0이면 목록이 존재하지 않는다는 메시지 출력
             {
-                builder
-                    .AppendLine("현재 일일퀘스트 목록이 없습니다.")
-                    .AppendLine("만약 기본 일일퀘스트 목록을 변경하였으면 reset 명령어를 실행해보세요.");
+                Console.WriteLine("현재 일일퀘스트 목록이 없습니다.");
+                Console.WriteLine("만약 기본 일일퀘스트 목록을 변경하였으면 reset 명령어를 실행해보세요.");
+                return;
             }
-            else
+
+            // 목록의 마지막 항목 번호를 뜻하는 목록의 갯수의 자리수 가져오기
+            int max = GetDigitLength(item.Quests.Count);
+            int hasDoneCount = 0;
+
+            for (int i = 0; i < item.Quests.Count; i++)
             {
-                // 목록의 마지막 항목 번호를 뜻하는 목록의 갯수의 자리수 가져오기
-                int max = GetDigitLength(item.Quests.Count);
-                int hasDoneCount = 0;
+                int length = GetDigitLength(i + 1);
+                string number = (i + 1).ToString();
 
-                for (int i = 0; i < item.Quests.Count; i++)
+                // 오른쪽 정렬
+                number = number.PadLeft(max - length + number.Length);
+                Console.Write($"  {number}. [");
+
+                if (item.Quests[i].HasDone)
                 {
-                    bool hasDone = item.Quests[i].HasDone;
-                    if (hasDone)
-                    {
-                        hasDoneCount++;
-                    }
-
-                    int length = GetDigitLength(i + 1);
-                    string number = (i + 1).ToString();
-                    // 오른쪽 정렬
-                    number = number.PadLeft(max - length + number.Length);
-                    builder.Append($"  {number}. ");
+                    hasDoneCount++;
                     if (item.UseEmoji)
                     {
-                        builder.Append($"[{(hasDone ? CheckMarkEmoji : CrossMarkEmoji)}] - ");
+                        Console.Write(CheckMarkEmoji);
                     }
                     else
                     {
-                        builder.Append($"[{(hasDone ? CheckMarkText : CrossMarkText)}] - ");
-                    }
-                    builder.AppendLine(item.Quests[i].QuestDescription);
-                }
-                builder.AppendLine();
-
-                // 모든 항목이 체크 되어있을 때
-                if (hasDoneCount == item.Quests.Count)
-                {
-                    if (item.UseEmoji)
-                    {
-                        builder.AppendLine("🎉🎉오늘의 일일퀘스트를 모두 끝냈습니다!🎉🎉");
-                    }
-                    else
-                    {
-                        builder.AppendLine(":::오늘의 일일퀘스트를 모두 끝냈습니다!:::");
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write(CheckMarkText);
+                        Console.ResetColor();
                     }
                 }
                 else
                 {
-                    builder.AppendLine($"현재 총 {item.Quests.Count}개의 항목 중 {hasDoneCount}개의 항목을 완료했습니다.");
-
-                    DateTime now = DateTime.Now;
-                    int hour = 23 - now.Hour;
-                    int minute = 59 - now.Minute;
-                    int second = 59 - now.Second;
-                    builder.AppendLine($"자정까지 {hour}시간 {minute}분 {second}초 남았습니다. 파이팅!{(item.UseEmoji ? "👊" : "")}");
+                    if (item.UseEmoji)
+                    {
+                        Console.Write(CrossMarkEmoji);
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write(CrossMarkText);
+                        Console.ResetColor();
+                    }
                 }
+
+                Console.Write("] - ");
+                Console.WriteLine(item.Quests[i].QuestDescription);
             }
 
-            Console.WriteLine(builder.ToString());
+            Console.WriteLine();
+
+            // 모든 항목이 체크 되어있을 때
+            if (hasDoneCount == item.Quests.Count)
+            {
+                if (item.UseEmoji)
+                {
+                    Console.WriteLine("🎉🎉오늘의 일일퀘스트를 모두 끝냈습니다!🎉🎉");
+                }
+                else
+                {
+                    Console.WriteLine(":::오늘의 일일퀘스트를 모두 끝냈습니다!:::");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"현재 총 {item.Quests.Count}개의 항목 중 {hasDoneCount}개의 항목을 완료했습니다.");
+
+                DateTime now = DateTime.Now;
+                int hour = 23 - now.Hour;
+                int minute = 59 - now.Minute;
+                int second = 59 - now.Second;
+                Console.WriteLine($"자정까지 {hour}시간 {minute}분 {second}초 남았습니다. 파이팅!{(item.UseEmoji ? "👊" : "")}");
+            }
 
             // 자연수의 자릿수를 구하는 로컬 함수
             static int GetDigitLength(int n) => n < 1 ? 0 : (int)Math.Log10(n) + 1;
