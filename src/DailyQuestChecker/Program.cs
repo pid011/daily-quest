@@ -36,50 +36,43 @@ namespace DailyQuestChecker
         private static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
-            try
+            DailyQuestItem item;
+
+            // 인자를 입력하지 않고 그냥 프로그램을 실행할 경우 그냥 일퀘목록만 출력
+            if (args.Length == 0)
             {
-                DailyQuestItem item;
-
-                // 인자를 입력하지 않고 그냥 프로그램을 실행할 경우 그냥 일퀘목록만 출력
-                if (args.Length == 0)
-                {
-                    item = DailyQuest.GetTodayDailyQuest();
-                    PrintDailyQuest(item);
-                }
-                else
-                {
-                    switch (args[0])
-                    {
-                        case "check":
-                            item = DailyQuest.GetTodayDailyQuest();
-                            RunCheckCommand(ref item, args);
-                            PrintDailyQuest(item);
-                            break;
-
-                        case "reset":
-                            item = DailyQuest.GetTodayDailyQuest();
-
-                            // Reset명령어 실행 후 유저가 초기화를 하면 초기화된 목록 출력
-                            if (RunResetCommand(ref item))
-                            {
-                                PrintDailyQuest(item);
-                            }
-                            break;
-
-                        case "-v":
-                            PrintVersionCommand();
-                            break;
-
-                        case "-h":
-                        default:
-                            PrintHelpMessage();
-                            break;
-                    }
-                }
+                item = DailyQuest.GetTodayDailyQuest();
+                PrintDailyQuest(item);
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine(e.ToString());
+                switch (args[0])
+                {
+                    case "check":
+                        item = DailyQuest.GetTodayDailyQuest();
+                        RunCheckCommand(ref item, args);
+                        PrintDailyQuest(item);
+                        break;
+
+                    case "reset":
+                        item = DailyQuest.GetTodayDailyQuest();
+
+                        // Reset명령어 실행 후 유저가 초기화를 하면 초기화된 목록 출력
+                        if (RunResetCommand(ref item))
+                        {
+                            PrintDailyQuest(item);
+                        }
+                        break;
+
+                    case "-v":
+                        PrintVersionCommand();
+                        break;
+
+                    case "-h":
+                    default:
+                        PrintHelpMessage();
+                        break;
+                }
             }
         }
 
