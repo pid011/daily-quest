@@ -289,12 +289,12 @@ namespace DailyQuestChecker
         /// <summary>
         /// 오늘의 일일퀘스트 항목을 가지고 있는 파일이름
         /// </summary>
-        private const string TodayDailyQuestFileName = "today-daily-quests.daily";
+        private const string TodayDailyQuestFileName = "daily-quest.today";
 
         /// <summary>
         /// 기본 일일퀘스트 리스트를 가지고 있는 파일이름
         /// </summary>
-        private const string DefaultDailyQuestFileName = "daily-quests.txt";
+        private const string DefaultDailyQuestFileName = "daily-quest.default.txt";
 
         private const string DataBaseDirectoryName = "database";
         private const string ConfigDirectoryName = "config";
