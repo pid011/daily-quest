@@ -29,6 +29,7 @@ namespace DailyQuest
         {
             ["check"] = "선택한 항목을 체크하거나 체크 해제합니다.",
             ["reset"] = "오늘의 일일퀘스트를 초기화합니다.",
+            ["config"] = "기본 일일퀘스트 항목의 파일 경로를 표시하거나 메모장으로 엽니다.",
             ["-v"] = "일일퀘스트 체크 프로그램의 버전을 표시합니다.",
             ["-h"] = "일일퀘스트 체크 프로그램의 도움말을 표시합니다.",
         };
@@ -62,6 +63,10 @@ namespace DailyQuest
                         {
                             PrintDailyQuest(item);
                         }
+                        break;
+
+                    case "config":
+                        RunConfigCommand(args);
                         break;
 
                     case "-v":
@@ -154,6 +159,34 @@ namespace DailyQuest
                         Console.WriteLine("다시 입력해주세요.");
                         break;
                 }
+            }
+        }
+
+        private static void RunConfigCommand(string[] args)
+        {
+            string path = DailyQuest.DefaultDailyQuestFilePath;
+            if (args.Length < 2)
+            {
+                Console.WriteLine(path);
+                return;
+            }
+            if (args[1] == "--open")
+            {
+                switch (Environment.OSVersion.Platform)
+                {
+                    case PlatformID.Win32NT: // Windows
+                        System.Diagnostics.Process.Start("notepad.exe", path);
+                        break;
+                    case PlatformID.Unix: // MacOSX, Linux
+                    default:
+                        Console.WriteLine("현재 프로그램에서 지원하지 않는 OS입니다.");
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("잘못된 옵션입니다.");
+                Console.WriteLine("[--open] 옵션을 사용하여 메모장으로 바로 열 수 있습니다.");
             }
         }
 
