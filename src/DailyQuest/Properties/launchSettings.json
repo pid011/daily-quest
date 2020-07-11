@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "DailyQuest": {
+      "commandName": "Project"
+    },
+    "Check command test": {
+      "commandName": "Project",
+      "commandLineArgs": "check 1"
+    }
+  }
+}

@@ -47,11 +47,17 @@ namespace DailyQuest
             }
             else
             {
+                string[] commandArgs = new string[args.Length - 1];
+                if (args.Length > 1)
+                {
+                    Array.Copy(args, 1, commandArgs, 0, commandArgs.Length);
+                }
+
                 switch (args[0])
                 {
                     case "check":
                         item = DailyQuest.GetTodayDailyQuest();
-                        RunCheckCommand(ref item, args);
+                        RunCheckCommand(ref item, commandArgs);
                         PrintDailyQuest(item);
                         break;
 
@@ -66,7 +72,7 @@ namespace DailyQuest
                         break;
 
                     case "config":
-                        RunConfigCommand(args);
+                        RunConfigCommand(commandArgs);
                         break;
 
                     case "-v":
@@ -81,22 +87,22 @@ namespace DailyQuest
             }
         }
 
-        private static void RunCheckCommand(ref DailyQuestItem item, string[] args)
+        private static void RunCheckCommand(ref DailyQuestItem item, string[] commandArgs)
         {
-            // args의 개수가 1개이면 항목번호를 입력하지 않은 것이므로 명령어 사용방법 출력
-            if (args.Length <= 1)
+            // args의 개수가 0개이면 항목번호를 입력하지 않은 것이므로 명령어 사용방법 출력
+            if (commandArgs.Length == 0)
             {
                 Console.WriteLine("명령어 사용방법: check [항목번호] (1개 이상의 항목번호 입력 가능)");
                 return;
             }
 
-            List<int> integers = new List<int>(args.Length - 1);
-            List<int> goodNumbers = new List<int>(integers.Count);
+            List<int> integers = new List<int>(commandArgs.Length);
+            List<int> goodNumbers = new List<int>(commandArgs.Length);
 
             // 정수가 아닌 입력 걸러내기
-            for (int i = 1; i < args.Length; i++)
+            for (int i = 0; i < commandArgs.Length; i++)
             {
-                if (int.TryParse(args[i], out int result))
+                if (int.TryParse(commandArgs[i], out int result))
                 {
                     integers.Add(result);
                 }
@@ -162,15 +168,15 @@ namespace DailyQuest
             }
         }
 
-        private static void RunConfigCommand(string[] args)
+        private static void RunConfigCommand(string[] commandArgs)
         {
             string path = DailyQuest.DefaultDailyQuestFilePath;
-            if (args.Length < 2)
+            if (commandArgs.Length == 0)
             {
                 Console.WriteLine(path);
                 return;
             }
-            if (args[1] == "--open")
+            if (commandArgs[0] == "--open")
             {
                 switch (Environment.OSVersion.Platform)
                 {
