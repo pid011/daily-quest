@@ -4,6 +4,8 @@ Command Line Interface daily quest to-do program
 
 You can use it for Maplestory, Etc...
 
+![preview image](./images/preview.png)
+
 ## Requirements
 
 .NET Core 3.1
