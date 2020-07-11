@@ -8,7 +8,7 @@
         <Description>매일매일 일일퀘스트 체크</Description>
         <PackageProjectUrl>https://github.com/pid011/daily-quest</PackageProjectUrl>
         <NeutralLanguage>ko</NeutralLanguage>
-        <Version>1.1.0</Version>
+        <Version>1.1.1</Version>
         <AssemblyName>daily-quest</AssemblyName>
         <RootNamespace>DailyQuest</RootNamespace>
         <StartupObject>DailyQuest.Program</StartupObject>
