@@ -44,47 +44,47 @@ namespace DailyQuest
             {
                 item = DailyQuest.GetTodayDailyQuest();
                 PrintDailyQuest(item);
+                return;
             }
-            else
+
+            string[] commandArgs = new string[args.Length - 1];
+            if (args.Length > 1)
             {
-                string[] commandArgs = new string[args.Length - 1];
-                if (args.Length > 1)
-                {
-                    Array.Copy(args, 1, commandArgs, 0, commandArgs.Length);
-                }
-
-                switch (args[0])
-                {
-                    case "check":
-                        item = DailyQuest.GetTodayDailyQuest();
-                        RunCheckCommand(ref item, commandArgs);
-                        PrintDailyQuest(item);
-                        break;
-
-                    case "reset":
-                        item = DailyQuest.GetTodayDailyQuest();
-
-                        // Reset명령어 실행 후 유저가 초기화를 하면 초기화된 목록 출력
-                        if (RunResetCommand(ref item))
-                        {
-                            PrintDailyQuest(item);
-                        }
-                        break;
-
-                    case "config":
-                        RunConfigCommand(commandArgs);
-                        break;
-
-                    case "-v":
-                        PrintVersionCommand();
-                        break;
-
-                    case "-h":
-                    default:
-                        PrintHelpMessage();
-                        break;
-                }
+                Array.Copy(args, 1, commandArgs, 0, commandArgs.Length);
             }
+
+            switch (args[0])
+            {
+                case "check":
+                    item = DailyQuest.GetTodayDailyQuest();
+                    RunCheckCommand(ref item, commandArgs);
+                    PrintDailyQuest(item);
+                    break;
+
+                case "reset":
+                    item = DailyQuest.GetTodayDailyQuest();
+
+                    // Reset명령어 실행 후 유저가 초기화를 하면 초기화된 목록 출력
+                    if (RunResetCommand(ref item))
+                    {
+                        PrintDailyQuest(item);
+                    }
+                    break;
+
+                case "config":
+                    RunConfigCommand(commandArgs);
+                    break;
+
+                case "-v":
+                    PrintVersionCommand();
+                    break;
+
+                case "-h":
+                default:
+                    PrintHelpMessage();
+                    break;
+            }
+
         }
 
         private static void RunCheckCommand(ref DailyQuestItem item, string[] commandArgs)
@@ -131,12 +131,11 @@ namespace DailyQuest
             if (goodNumbers.Count == 0)
             {
                 Console.WriteLine("제대로 된 번호를 입력하지 않아 아무런 항목도 수정되지 않았습니다.");
+                return;
             }
-            else
-            {
-                DailyQuest.WriteFileAndRefreshTime(ref item);
-                Console.WriteLine($"{string.Join(", ", goodNumbers)}번 항목이 수정 되었습니다.");
-            }
+
+            DailyQuest.WriteFileAndRefreshTime(ref item);
+            Console.WriteLine($"{string.Join(", ", goodNumbers)}번 항목이 수정 되었습니다.");
         }
 
         private static bool RunResetCommand(ref DailyQuestItem item)
@@ -176,23 +175,22 @@ namespace DailyQuest
                 Console.WriteLine(path);
                 return;
             }
-            if (commandArgs[0] == "--open")
-            {
-                switch (Environment.OSVersion.Platform)
-                {
-                    case PlatformID.Win32NT: // Windows
-                        System.Diagnostics.Process.Start("notepad.exe", path);
-                        break;
-                    case PlatformID.Unix: // MacOSX, Linux
-                    default:
-                        Console.WriteLine("현재 프로그램에서 지원하지 않는 OS입니다.");
-                        break;
-                }
-            }
-            else
+            if (commandArgs[0] != "--open")
             {
                 Console.WriteLine("잘못된 옵션입니다.");
                 Console.WriteLine("[--open] 옵션을 사용하여 메모장으로 바로 열 수 있습니다.");
+                return;
+            }
+
+            switch (Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT: // Windows
+                    System.Diagnostics.Process.Start("notepad.exe", path);
+                    break;
+                case PlatformID.Unix: // MacOSX, Linux
+                default:
+                    Console.WriteLine("현재 프로그램에서 지원하지 않는 OS입니다.");
+                    break;
             }
         }
 
@@ -215,6 +213,9 @@ namespace DailyQuest
 
         private static void PrintDailyQuest(DailyQuestItem item)
         {
+            // 자연수의 자릿수를 구하는 로컬 함수
+            static int GetDigitLength(int n) => n < 1 ? 0 : (int)Math.Log10(n) + 1;
+
             Console.WriteLine();
 
             if (item.Quests.Count == 0) // 갯수가 0이면 목록이 존재하지 않는다는 메시지 출력
@@ -293,9 +294,6 @@ namespace DailyQuest
                 int second = 59 - now.Second;
                 Console.WriteLine($"자정까지 {hour}시간 {minute}분 {second}초 남았습니다. 파이팅!{(item.UseEmoji ? "👊" : "")}");
             }
-
-            // 자연수의 자릿수를 구하는 로컬 함수
-            static int GetDigitLength(int n) => n < 1 ? 0 : (int)Math.Log10(n) + 1;
         }
     }
 
