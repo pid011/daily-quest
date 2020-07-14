@@ -17,7 +17,7 @@ Please install it from [link](https://dotnet.microsoft.com/download)
 
 ```powershell
 git clone https://github.com/pid011/daily-quest.git
-cd daily-quest
+cd daily-quest/src/DailyQuest
 dotnet publish -c Release -o [publish directory]
 ```
 
