@@ -5,7 +5,7 @@
     },
     "Check command test": {
       "commandName": "Project",
-      "commandLineArgs": "check 1"
+      "commandLineArgs": "check 3 1 5 2"
     }
   }
 }

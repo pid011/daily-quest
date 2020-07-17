@@ -96,22 +96,21 @@ namespace DailyQuest
                 return;
             }
 
-            List<int> integers = new List<int>(commandArgs.Length);
+            SortedSet<int> sortedIntegers = new SortedSet<int>();
             List<int> goodNumbers = new List<int>(commandArgs.Length);
 
-            // 정수가 아닌 입력 걸러내기
+            // 정수가 아닌 입력 걸러내면서 오름차순으로 정렬
             for (int i = 0; i < commandArgs.Length; i++)
             {
-                if (int.TryParse(commandArgs[i], out int result))
+                if (!int.TryParse(commandArgs[i], out int result))
                 {
-                    integers.Add(result);
+                    continue;
                 }
+                sortedIntegers.Add(result);
             }
-            // 입력된 숫자를 오름차순으로 정렬
-            integers.Sort();
 
             // 중복된 숫자를 제거하고 반복문 실행
-            foreach (var i in integers.Distinct())
+            foreach (var i in sortedIntegers.Distinct())
             {
                 try
                 {
