@@ -39,7 +39,6 @@ namespace DailyQuest
             Console.OutputEncoding = Encoding.UTF8;
             DailyQuestItem item;
 
-            // 인자를 입력하지 않고 그냥 프로그램을 실행할 경우 그냥 일퀘목록만 출력
             if (args.Length == 0)
             {
                 item = DailyQuest.GetTodayDailyQuest();
@@ -64,7 +63,6 @@ namespace DailyQuest
                 case "reset":
                     item = DailyQuest.GetTodayDailyQuest();
 
-                    // Reset명령어 실행 후 유저가 초기화를 하면 초기화된 목록 출력
                     if (RunResetCommand(ref item))
                     {
                         PrintDailyQuest(item);
@@ -89,7 +87,6 @@ namespace DailyQuest
 
         private static void RunCheckCommand(ref DailyQuestItem item, string[] commandArgs)
         {
-            // args의 개수가 0개이면 항목번호를 입력하지 않은 것이므로 명령어 사용방법 출력
             if (commandArgs.Length == 0)
             {
                 Console.WriteLine("명령어 사용방법: check [항목번호] (1개 이상의 항목번호 입력 가능)");
@@ -99,7 +96,6 @@ namespace DailyQuest
             SortedSet<int> sortedIntegers = new SortedSet<int>();
             List<int> goodNumbers = new List<int>(commandArgs.Length);
 
-            // 정수가 아닌 입력 걸러내면서 오름차순으로 정렬
             for (int i = 0; i < commandArgs.Length; i++)
             {
                 if (!int.TryParse(commandArgs[i], out int result))
@@ -109,24 +105,19 @@ namespace DailyQuest
                 sortedIntegers.Add(result);
             }
 
-            // 중복된 숫자를 제거하고 반복문 실행
             foreach (var i in sortedIntegers.Distinct())
             {
                 try
                 {
-                    // 해당 항목의 bool 값을 반대 값으로 변경
                     item.Quests[i - 1].HasDone = !item.Quests[i - 1].HasDone;
-                    // 값을 변경의 항목의 번호 추가
                     goodNumbers.Add(i);
                 }
                 catch (ArgumentOutOfRangeException)
                 {
-                    // 만약 입력된 번호가 현재 존재하는 일일퀘스트 번호와 맞지 않으면 그냥 넘어가기
                     continue;
                 }
             }
 
-            // goodNumbers의 개수가 0개면 아무런 항목도 수정되지 않은 것임
             if (goodNumbers.Count == 0)
             {
                 Console.WriteLine("제대로 된 번호를 입력하지 않아 아무런 항목도 수정되지 않았습니다.");
@@ -149,9 +140,7 @@ namespace DailyQuest
                 {
                     case "Y":
                     case "y":
-                        // 파일에서 기본 일일퀘스트 목록을 가져오기
                         item = DailyQuest.GetDefaultDailyQuest();
-                        // 오늘의 일일퀘스트 파일에 기본 일일퀘스트 데이터 쓰기
                         DailyQuest.WriteFileAndRefreshTime(ref item);
                         Console.WriteLine("오늘의 일일퀘스트가 초기화되었습니다.");
                         return true;
@@ -207,24 +196,22 @@ namespace DailyQuest
         private static void PrintVersionCommand()
         {
             AssemblyName assm = typeof(Program).Assembly.GetName();
-            Console.WriteLine($"{assm.Name} v{assm.Version.ToString(3)}"); // 프로그램의 버전 출력
+            Console.WriteLine($"{assm.Name} v{assm.Version.ToString(3)}");
         }
 
         private static void PrintDailyQuest(DailyQuestItem item)
         {
-            // 자연수의 자릿수를 구하는 로컬 함수
             static int GetDigitLength(int n) => n < 1 ? 0 : (int)Math.Log10(n) + 1;
 
             Console.WriteLine();
 
-            if (item.Quests.Count == 0) // 갯수가 0이면 목록이 존재하지 않는다는 메시지 출력
+            if (item.Quests.Count == 0)
             {
                 Console.WriteLine("현재 일일퀘스트 목록이 없습니다.");
                 Console.WriteLine("만약 기본 일일퀘스트 목록을 변경하였으면 reset 명령어를 실행해보세요.");
                 return;
             }
 
-            // 목록의 마지막 항목 번호를 뜻하는 목록의 갯수의 자리수 가져오기
             int max = GetDigitLength(item.Quests.Count);
             int hasDoneCount = 0;
 
@@ -233,7 +220,6 @@ namespace DailyQuest
                 int length = GetDigitLength(i + 1);
                 string number = (i + 1).ToString();
 
-                // 오른쪽 정렬
                 number = number.PadLeft(max - length + number.Length);
                 Console.Write($"  {number}. [");
 
@@ -271,7 +257,6 @@ namespace DailyQuest
 
             Console.WriteLine();
 
-            // 모든 항목이 체크 되어있을 때
             if (hasDoneCount == item.Quests.Count)
             {
                 if (item.UseEmoji)
@@ -320,7 +305,6 @@ namespace DailyQuest
             {
                 string dirPath = Path.Combine(_programDirectoryPath, DataBaseDirectoryName);
 
-                // 디렉토리가 존재하지 않으면 새로 만들고 파일경로 반환
                 return Path.Combine(Directory.CreateDirectory(dirPath).FullName, TodayDailyQuestFileName);
             }
         }
@@ -334,7 +318,6 @@ namespace DailyQuest
             {
                 string dirPath = Path.Combine(_programDirectoryPath, ConfigDirectoryName);
 
-                // 디렉토리가 존재하지 않으면 새로 만들고 파일경로 반환
                 return Path.Combine(Directory.CreateDirectory(dirPath).FullName, DefaultDailyQuestFileName);
             }
         }
@@ -359,7 +342,6 @@ namespace DailyQuest
 
             try
             {
-                // 파일에서 json으로 구성된 오늘의 일일퀘스트 목록 가져오기
                 using FileStream fs = File.OpenRead(TodayDailyQuestFilePath);
                 byte[] jsonBytes = new byte[fs.Length];
                 int numBytesToRead = (int)fs.Length;
@@ -375,10 +357,8 @@ namespace DailyQuest
                     numBytesToRead -= n;
                 }
                 var utf8Reader = new Utf8JsonReader(jsonBytes);
-                // json 데이터를 DailyQuestItem으로 역직렬화
                 item = JsonSerializer.Deserialize<DailyQuestItem>(ref utf8Reader);
 
-                // 현재 날짜가 데이터가 기록된 시간의 날짜와 다를 때
                 if (DateTime.Now.Day != item.RefreshTime.Day)
                 {
                     deserialized = false;
@@ -395,7 +375,6 @@ namespace DailyQuest
 
             if (!deserialized)
             {
-                // 기본 일일퀘스트로 다시 덮어쓰기
                 item = GetDefaultDailyQuest();
                 WriteFileAndRefreshTime(ref item);
             }
@@ -409,15 +388,11 @@ namespace DailyQuest
         /// <param name="item">파일에 작성할 데이터</param>
         public static void WriteFileAndRefreshTime(ref DailyQuestItem item)
         {
-            // item이 null일 경우 새 인스턴스 생성
             item ??= new DailyQuestItem();
             item.Quests ??= new List<Quest>();
-            // item 객체의 RefreshTime을 현재로 수정
             item.RefreshTime = DateTime.Now;
 
-            // 데이터를 새로 덮어쓰기
             using FileStream fs = File.Create(TodayDailyQuestFilePath);
-            // item을 json으로 직렬화 후 파일에 쓰기
             byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(item);
             fs.Write(jsonBytes, 0, jsonBytes.Length);
         }
@@ -441,7 +416,6 @@ namespace DailyQuest
                 using StreamReader sr = File.OpenText(DefaultDailyQuestFilePath);
                 string input;
 
-                // 파일의 첫 줄에서 이모지 사용 여부 읽어오기
                 input = sr.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -455,10 +429,8 @@ namespace DailyQuest
                     }
                 }
 
-                // 파일에서 한 줄씩 읽어오기
                 while ((input = sr.ReadLine()) != null)
                 {
-                    // 읽어온 문자열이 비어있거나 띄어쓰기만 있으면 건너뛰기
                     if (!string.IsNullOrWhiteSpace(input))
                     {
                         dailyQuest.Quests.Add(new Quest { QuestDescription = input });
@@ -467,7 +439,6 @@ namespace DailyQuest
             }
             catch (FileNotFoundException)
             {
-                // 파일이 존재하지 않는 경우 새로 만들고 처음에 생성한 인스턴스를 그대로 반환하기
                 File.Create(DefaultDailyQuestFilePath);
             }
 
