@@ -22,7 +22,7 @@ namespace DailyQuest
         private const string CrossMarkEmoji = "❌";
         private const string CrossMarkText = "X";
 
-        private static readonly Dictionary<string, string> _commands = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> s_commands = new Dictionary<string, string>
         {
             ["check"] = "선택한 항목을 체크하거나 체크 해제합니다.",
             ["reset"] = "오늘의 일일퀘스트를 초기화합니다.",
@@ -102,7 +102,7 @@ namespace DailyQuest
                 sortedIntegers.Add(result);
             }
 
-            foreach (var i in sortedIntegers.Distinct())
+            foreach (int i in sortedIntegers.Distinct())
             {
                 try
                 {
@@ -183,7 +183,7 @@ namespace DailyQuest
         {
             StringBuilder builder = new StringBuilder();
             builder.AppendLine("명령어 목록:");
-            foreach (KeyValuePair<string, string> item in _commands)
+            foreach (KeyValuePair<string, string> item in s_commands)
             {
                 builder.AppendLine($"{' ',2}{item.Key,-20}{item.Value}");
             }
