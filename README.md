@@ -15,7 +15,7 @@ You can use it for Maplestory, Etc...
 It is required .NET Core 3.1 SDK.
 Please install it from [link](https://dotnet.microsoft.com/download)
 
-```powershell
+```plaintext
 git clone https://github.com/pid011/daily-quest.git
 cd daily-quest/src/DailyQuest
 dotnet publish -c Release -o [publish directory]
