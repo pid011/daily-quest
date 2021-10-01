@@ -33,7 +33,7 @@ namespace DailyQuest
             {
                 string dirPath = Path.Combine(_programDirectoryPath, DataBaseDirectoryName);
 
-                return Path.Combine(Directory.CreateDirectory(dirPath).FullName, TodayDailyQuestFileName);
+                return Path.Combine(Directory.CreateDirectory(dirPath).FullName, TodayDailyQuestFileName)     ;
             }
         }
 
